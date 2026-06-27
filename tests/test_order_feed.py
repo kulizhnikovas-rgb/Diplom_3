@@ -51,8 +51,6 @@ class TestOrderFeed:
         make_ui_order()
         
         main_page.click_order_feed_button()
-        WebDriverWait(main_page.driver, 10).until_not(
-            EC.text_to_be_present_in_element(OrderFeedLocators.TODAY_ORDERS_COUNTER, str(before_today))
-        )
+        order_feed_page.wait_for_today_counter_to_change(before_today)
         after_today = int(order_feed_page.get_today_orders_value())
         assert after_today > before_today

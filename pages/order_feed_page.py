@@ -29,26 +29,27 @@ class OrderFeedPage(BasePage):
     
     @allure.step("Дождаться обновления счётчика и получить его значение")
     def wait_and_get_total_orders_value(self, expected_value):
-        WebDriverWait(self.driver, 10).until(
-            EC.text_to_be_present_in_element(OrderFeedLocators.TOTAL_ORDERS_COUNTER, str(expected_value))
-        )
+        self.wait_for_text_in_element(OrderFeedLocators.TOTAL_ORDERS_COUNTER, str(expected_value))
         return int(self.get_total_orders_value())
     
     @allure.step("Получить список номеров заказов в разделе 'В работе'")
     def get_orders_in_progress_values(self):
-        elements = self.driver.find_elements(*OrderFeedLocators.ORDERS_IN_PROGRESS_LIST)
+        elements = self.find_elements_with_wait(OrderFeedLocators.ORDERS_IN_PROGRESS_LIST)
         return [el.text for el in elements]
     
     def wait_for_order_to_appear(self, order_num):
-        WebDriverWait(self.driver, 20).until(
-            lambda d: order_num in [el.text for el in d.find_elements(*OrderFeedLocators.ORDERS_IN_PROGRESS_LIST)]
-    )
+        self.wait_for_text_to_appear_in_list(
+            OrderFeedLocators.ORDERS_IN_PROGRESS_LIST, 
+            str(order_num)
+        )
         
     def wait_and_get_total_orders_value(self, expected_value):
-        WebDriverWait(self.driver, 20).until(
-            EC.text_to_be_present_in_element(
-                OrderFeedLocators.TOTAL_ORDERS_COUNTER, 
-                str(expected_value)
-            )
-        )
+        self.wait_for_text_in_element(OrderFeedLocators.TOTAL_ORDERS_COUNTER, str(expected_value))
         return int(self.get_total_orders_value())
+    
+    @allure.step("Дождаться изменения счётчика заказов за сегодня")
+    def wait_for_today_counter_to_change(self, before_value):
+        self.wait_for_text_to_disappear_from_element(
+            OrderFeedLocators.TODAY_ORDERS_COUNTER, 
+            str(before_value)
+        )
